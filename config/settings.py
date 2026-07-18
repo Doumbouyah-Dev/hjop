@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
+     "allauth.socialaccount.providers.google",
     # We'll add specific OAuth providers in Phase 4
 
     # Local apps
@@ -130,6 +131,20 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# ── Social Auth Providers ────────────────────────────────
+SOCIALACCOUNT_PROVIDERS = {
+    "google": {
+        "APP": {
+            "client_id": env("GOOGLE_OAUTH_CLIENT_ID", default=""),
+            "secret": env("GOOGLE_OAUTH_CLIENT_SECRET", default=""),
+            "key": "",
+        },
+        "SCOPE": ["profile", "email"],
+        "AUTH_PARAMS": {"access_type": "online"},
+        "OAUTH_PKCE_ENABLED": True,
+    },
+}
+
 # ── Authentication backends ─────────────────────────────
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
@@ -187,4 +202,14 @@ ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_ADAPTER = "apps.accounts.adapters.CustomAccountAdapter"
 ACCOUNT_FORMS = {
     "signup": "apps.accounts.forms.CustomSignupForm",
+    "socialaccount_signup": "apps.accounts.forms.CustomSocialSignupForm",
 }
+# When a user signs up via Google, auto-connect to an existing
+# local account with the same verified email instead of erroring —
+# this matches the original project's intent of unifying OAuth +
+# password users under one identity.
+SOCIALACCOUNT_AUTO_SIGNUP = True
+SOCIALACCOUNT_EMAIL_VERIFICATION = "none"
+SOCIALACCOUNT_STORE_TOKENS = False
+SOCIALACCOUNT_EMAIL_AUTHENTICATION = True
+SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True

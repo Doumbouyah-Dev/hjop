@@ -1,6 +1,6 @@
 from allauth.account.forms import SignupForm
 from django import forms
-
+from allauth.socialaccount.forms import SignupForm as SocialSignupForm
 from .models import User
 
 
@@ -53,6 +53,26 @@ class CustomSignupForm(SignupForm):
         name_parts = full_name.split(" ", 1)
         user.first_name = name_parts[0]
         user.last_name = name_parts[1] if len(name_parts) > 1 else ""
+        user.role = self.cleaned_data["role"]
+        user.save()
+        return user
+
+
+class CustomSocialSignupForm(SocialSignupForm):
+    """
+    Shown after successful Google auth, before final account creation —
+    lets social-login users pick Job Seeker vs Employer, since Google
+    never asks this and allauth's social flow bypasses CustomSignupForm.
+    """
+    role = forms.ChoiceField(
+        choices=User.Role.choices,
+        initial=User.Role.JOB_SEEKER,
+        widget=forms.RadioSelect,
+        label="I am a...",
+    )
+
+    def save(self, request):
+        user = super().save(request)
         user.role = self.cleaned_data["role"]
         user.save()
         return user
