@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.sites",  # required by allauth
+    'django.contrib.postgres',
 
     # Third-party
     "django_htmx",
