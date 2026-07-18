@@ -130,6 +130,12 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# ── Authentication backends ─────────────────────────────
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
+]
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
@@ -162,4 +168,23 @@ LOGIN_URL = "account_login"
 LOGIN_REDIRECT_URL = "dashboard:home"
 LOGOUT_REDIRECT_URL = "core:home"
 
+# Rate limiting (allauth built-in, replaces the missing rate-limit
+# from the original Node version)
+ACCOUNT_RATE_LIMITS = {
+    "login_failed": "5/5m",
+}
 
+# ── Email backend (console for dev — prints emails to terminal) ──
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+DEFAULT_FROM_EMAIL = "HJ Opportunity Hub <noreply@hjopportunityhub.com>"
+
+# ── django-allauth configuration (modern settings API, allauth 65+) ──
+ACCOUNT_LOGIN_METHODS = {"email"}
+ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
+ACCOUNT_EMAIL_VERIFICATION = "optional"   # set to "mandatory" once you configure real email sending
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+ACCOUNT_ADAPTER = "apps.accounts.adapters.CustomAccountAdapter"
+ACCOUNT_FORMS = {
+    "signup": "apps.accounts.forms.CustomSignupForm",
+}

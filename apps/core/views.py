@@ -1,5 +1,5 @@
-from django.http import HttpResponse
+from django.shortcuts import render
 
 
 def home(request):
-    return HttpResponse("HJ Opportunity Hub — Phase 2 scaffold. Home page built in Phase 7.")
+    return render(request, "core/home_test.html")

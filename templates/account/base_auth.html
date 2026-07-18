@@ -1,0 +1,84 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}HJ Opportunity Hub{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: "#0B1F33",
+                        amber: {
+                            DEFAULT: "#F4B400",
+                            dark: "#E5A800",
+                        },
+                    },
+                },
+            },
+        };
+    </script>
+</head>
+<body class="min-h-screen flex">
+
+    <!-- Left side — brand visual, hidden on mobile -->
+    <div class="hidden lg:flex lg:w-1/2 bg-navy relative overflow-hidden items-center justify-center">
+        <div class="absolute inset-0 opacity-5"
+             style="background-image: radial-gradient(circle at 1px 1px, #F4B400 1px, transparent 0); background-size: 40px 40px;">
+        </div>
+        <div class="relative z-10 max-w-md px-8 text-center">
+            <div class="w-16 h-16 bg-amber rounded-xl flex items-center justify-center mx-auto mb-6">
+                <span class="text-navy font-extrabold text-2xl">HJ</span>
+            </div>
+            <h2 class="text-3xl font-bold text-white mb-4">
+                {% block hero_title %}HJ Opportunity Hub{% endblock %}
+            </h2>
+            <p class="text-gray-300 text-lg mb-8">
+                {% block hero_subtitle %}Your gateway to thousands of opportunities across Liberia and Africa.{% endblock %}
+            </p>
+            <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 text-left">
+                <p class="text-white italic text-sm leading-relaxed">
+                    &ldquo;HJ Opportunity Hub helped me land a fully-funded scholarship. This platform changed my career trajectory.&rdquo;
+                </p>
+                <div class="flex items-center gap-3 mt-4">
+                    <div class="w-10 h-10 rounded-full bg-amber flex items-center justify-center text-navy font-bold">
+                        A
+                    </div>
+                    <div>
+                        <p class="text-white font-medium text-sm">Amara Johnson</p>
+                        <p class="text-gray-400 text-xs">Program Manager, Mercy Corps</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right side — form content -->
+    <div class="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12 bg-white">
+        <div class="w-full max-w-md">
+
+            <div class="lg:hidden w-12 h-12 bg-amber rounded-xl flex items-center justify-center mx-auto mb-4">
+                <span class="text-navy font-extrabold text-lg">HJ</span>
+            </div>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="mb-4 px-4 py-3 rounded-lg text-sm
+                        {% if message.tags == 'error' %}bg-red-50 text-red-700 border border-red-200
+                        {% elif message.tags == 'success' %}bg-green-50 text-green-700 border border-green-200
+                        {% else %}bg-blue-50 text-blue-700 border border-blue-200{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            {% block auth_content %}{% endblock %}
+
+        </div>
+    </div>
+
+</body>
+</html>
