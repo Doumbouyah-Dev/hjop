@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% load core_extras %}
+
+{% block content %}
+
+<!-- ── Hero ── -->
+<section class="relative bg-navy overflow-hidden">
+    <div class="absolute inset-0 opacity-5"
+         style="background-image: radial-gradient(circle at 1px 1px, #F4B400 1px, transparent 0); background-size: 40px 40px;"></div>
+
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24 text-center">
+        <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight mb-4">
+            Discover Your Next <span class="text-amber">Opportunity</span> in Liberia & Beyond
+        </h1>
+        <p class="text-gray-300 text-lg mb-8 max-w-xl mx-auto">
+            Jobs, scholarships, grants, fellowships, and more — all in one place.
+        </p>
+
+        <!-- Search Bar -->
+        <form action="{% url 'opportunities:list' %}" method="get"
+              class="bg-white rounded-xl p-2 shadow-2xl mb-6 max-w-2xl mx-auto">
+            <div class="flex flex-col sm:flex-row gap-2">
+                <div class="flex-1 flex items-center gap-2 px-3 py-2">
+                    <svg class="w-5 h-5 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z"/>
+                    </svg>
+                    <input type="text" name="search" placeholder="Job title, keyword, or category"
+                           class="flex-1 border-0 focus:outline-none focus:ring-0 text-sm">
+                </div>
+                <div class="hidden sm:block w-px bg-gray-200"></div>
+                <div class="flex-1 flex items-center gap-2 px-3 py-2">
+                    <svg class="w-5 h-5 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                    <input type="text" name="country" placeholder="Country or city"
+                           class="flex-1 border-0 focus:outline-none focus:ring-0 text-sm">
+                </div>
+                <button type="submit" class="btn-primary px-6">Search</button>
+            </div>
+        </form>
+
+        <div class="flex flex-wrap items-center gap-2 justify-center">
+            <span class="text-gray-400 text-sm">Popular:</span>
+            {% for term in "Software Engineer,Scholarship,NGO,Remote,Graduate"|split:"," %}
+            <a href="{% url 'opportunities:list' %}?search={{ term }}" class="text-amber text-sm hover:underline">{{ term }}</a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- ── Stats Bar ── -->
+<section class="bg-white border-b border-gray-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+            <div>
+                <span class="text-2xl font-bold text-navy">{{ stats.total_opportunities|intcomma }}+</span>
+                <p class="text-sm text-gray-500">Total Opportunities</p>
+            </div>
+            <div>
+                <span class="text-2xl font-bold text-navy">{{ stats.active_jobs|intcomma }}+</span>
+                <p class="text-sm text-gray-500">Active Jobs</p>
+            </div>
+            <div>
+                <span class="text-2xl font-bold text-navy">{{ stats.scholarships|intcomma }}+</span>
+                <p class="text-sm text-gray-500">Scholarships</p>
+            </div>
+            <div>
+                <span class="text-2xl font-bold text-navy">{{ stats.organizations|intcomma }}+</span>
+                <p class="text-sm text-gray-500">Partner Organizations</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ── Categories ── -->
+<section class="py-20 bg-gray-50/50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold text-navy mb-3">Browse by Category</h2>
+            <p class="text-gray-500 max-w-xl mx-auto">Explore opportunities across various categories tailored for the African job market</p>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            {% for cat in categories %}
+            <a href="{% url 'opportunities:list' %}?category={{ cat.slug }}"
+               class="flex flex-col items-center gap-3 p-6 bg-white rounded-xl border border-gray-100 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 hover:border-amber/40">
+                <span class="text-sm font-medium text-gray-700 text-center">{{ cat.name }}</span>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- ── Featured Opportunities ── -->
+{% if featured_opportunities %}
+<section class="py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <h2 class="text-3xl font-bold text-navy mb-1">Featured Opportunities</h2>
+                <p class="text-gray-500">Hand-picked opportunities just for you</p>
+            </div>
+            <a href="{% url 'opportunities:list' %}" class="btn-outline hidden sm:flex">View All</a>
+        </div>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for opportunity in featured_opportunities %}
+                {% include "opportunities/partials/card.html" %}
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- ── Latest Jobs ── -->
+{% if latest_jobs %}
+<section class="py-20 bg-gray-50/50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <h2 class="text-2xl font-bold text-navy mb-1">Latest Jobs</h2>
+                <p class="text-gray-500">Fresh job openings across Liberia and Africa</p>
+            </div>
+            <a href="{% url 'opportunities:list' %}?category=jobs" class="btn-outline hidden sm:flex">View All</a>
+        </div>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for opportunity in latest_jobs %}
+                {% include "opportunities/partials/card.html" %}
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- ── Latest Scholarships ── -->
+{% if latest_scholarships %}
+<section class="py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <h2 class="text-2xl font-bold text-navy mb-1">Latest Scholarships</h2>
+                <p class="text-gray-500">Funding opportunities for your education</p>
+            </div>
+            <a href="{% url 'opportunities:list' %}?category=scholarships" class="btn-outline hidden sm:flex">View All</a>
+        </div>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for opportunity in latest_scholarships %}
+                {% include "opportunities/partials/card.html" %}
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- ── Trending Articles ── -->
+{% if articles %}
+<section class="py-20 bg-gray-50/50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between mb-8">
+            <h2 class="text-3xl font-bold text-navy">Trending Articles</h2>
+            <a href="{% url 'articles:list' %}" class="btn-outline hidden sm:flex">View All</a>
+        </div>
+        <div class="grid md:grid-cols-3 gap-6">
+            {% for article in articles %}
+            <a href="{% url 'articles:detail' article.slug %}"
+               class="card overflow-hidden p-0 block">
+                <div class="h-40 bg-gradient-to-br from-navy to-[#1a3050] flex items-center justify-center">
+                    {% if article.cover_image %}
+                        <img src="{{ article.cover_image.url }}" alt="" class="w-full h-full object-cover">
+                    {% endif %}
+                </div>
+                <div class="p-5">
+                    <span class="badge bg-gray-50 text-gray-600 border-gray-200 mb-2">{{ article.category }}</span>
+                    <h3 class="font-semibold text-navy mb-2 line-clamp-2">{{ article.title }}</h3>
+                    <p class="text-gray-500 text-sm line-clamp-2">{{ article.excerpt }}</p>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- ── Newsletter CTA ── -->
+<section class="py-16 bg-amber">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h2 class="text-3xl font-bold text-navy mb-3">Never Miss an Opportunity</h2>
+        <p class="text-navy/80 mb-8">Get the latest jobs, scholarships, and grants delivered to your inbox weekly.</p>
+        <form class="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+            <input type="email" placeholder="Enter your email"
+                   class="bg-white border-0 h-12 rounded-lg px-4 text-navy placeholder:text-gray-500 flex-1 focus:outline-none focus:ring-2 focus:ring-navy">
+            <button type="submit" class="bg-navy text-white hover:bg-opacity-90 h-12 px-6 rounded-lg font-semibold shrink-0">
+                Subscribe
+            </button>
+        </form>
+    </div>
+</section>
+{% endblock %}

@@ -194,3 +194,9 @@ class Opportunity(models.Model):
     @property
     def is_urgent_deadline(self):
         return 0 <= self.days_left <= 7
+    
+    @property
+    def days_left(self):
+        from django.utils import timezone
+        delta = self.deadline - timezone.now().date()
+        return delta.days

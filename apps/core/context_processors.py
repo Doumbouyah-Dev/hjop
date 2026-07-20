@@ -1,19 +1,17 @@
-"""
-Global template context processors for HJ Opportunity Hub.
-
-These values are injected into every template's context automatically,
-so things like site branding or global stats don't need to be passed
-manually from every view. Expanded in Phase 6 with real site-wide data
-(e.g., category list for nav, saved-count badge, etc.).
-"""
+from apps.categories.models import Category
 
 
 def site_settings(request):
     """
-    Provides site-wide constants available in all templates.
-    Placeholder for Phase 2 — expanded significantly in Phase 6.
+    Injects data needed on every page (navbar categories, saved-count badge)
+    without every view having to remember to fetch it manually.
     """
-    return {
-        "SITE_NAME": "HJ Opportunity Hub",
-        "SITE_TAGLINE": "Your Gateway to Opportunities in Liberia & Africa",
+    context = {
+        "nav_categories": Category.objects.filter(active=True).order_by("display_order")[:6],
+        "more_categories": Category.objects.filter(active=True).order_by("display_order")[6:14],
     }
+
+    if request.user.is_authenticated:
+        context["saved_count"] = request.user.bookmarks.count()
+
+    return context

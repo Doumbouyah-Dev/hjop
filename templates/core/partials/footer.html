@@ -1,0 +1,54 @@
+<footer class="bg-navy text-white mt-auto">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+
+            <div class="lg:col-span-1">
+                <a href="{% url 'core:home' %}" class="flex items-center gap-2 mb-4">
+                    <div class="w-10 h-10 bg-amber rounded-lg flex items-center justify-center">
+                        <span class="text-navy font-extrabold text-lg">HJ</span>
+                    </div>
+                    <span class="text-white font-bold text-xl">Opportunity Hub</span>
+                </a>
+                <p class="text-gray-400 text-sm leading-relaxed mb-6">
+                    Your Gateway to Opportunities in Liberia & Africa. Discover jobs, scholarships, grants, and more.
+                </p>
+            </div>
+
+            <div>
+                <h4 class="text-sm font-semibold uppercase tracking-wider text-gray-300 mb-4">Opportunities</h4>
+                <ul class="space-y-3">
+                    {% for cat in nav_categories %}
+                    <li>
+                        <a href="{% url 'opportunities:list' %}?category={{ cat.slug }}" class="text-gray-400 hover:text-amber text-sm transition-colors">
+                            {{ cat.name }}
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="text-sm font-semibold uppercase tracking-wider text-gray-300 mb-4">Company</h4>
+                <ul class="space-y-3">
+                    <li><a href="{% url 'articles:list' %}" class="text-gray-400 hover:text-amber text-sm transition-colors">Blog</a></li>
+                    <li><a href="#" class="text-gray-400 hover:text-amber text-sm transition-colors">About Us</a></li>
+                    <li><a href="#" class="text-gray-400 hover:text-amber text-sm transition-colors">Contact</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="text-sm font-semibold uppercase tracking-wider text-gray-300 mb-4">Newsletter</h4>
+                <p class="text-gray-400 text-sm mb-4">Get the latest opportunities delivered to your inbox weekly.</p>
+                <form class="flex gap-2">
+                    <input type="email" placeholder="Enter your email"
+                           class="bg-white/10 border border-white/20 text-white placeholder:text-gray-500 rounded-lg px-3 py-2 text-sm flex-1 focus:outline-none focus:ring-2 focus:ring-amber">
+                    <button type="submit" class="btn-primary text-sm shrink-0">Subscribe</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="mt-12 pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p class="text-gray-500 text-sm">&copy; {% now "Y" %} HJ Opportunity Hub. Made with pride for Liberia & Africa.</p>
+        </div>
+    </div>
+</footer>

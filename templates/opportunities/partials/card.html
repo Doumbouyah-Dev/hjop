@@ -1,0 +1,95 @@
+{% load humanize %}
+<a href="{% url 'opportunities:detail' opportunity.slug %}"
+   class="card group block h-full hover:-translate-y-0.5">
+
+    <!-- Top row: badges + bookmark -->
+    <div class="flex items-start justify-between gap-2 mb-3">
+        <div class="flex flex-wrap gap-1.5">
+            <span class="badge bg-blue-50 text-blue-700 border-blue-200">
+                {{ opportunity.get_category_display }}
+            </span>
+            {% if opportunity.remote %}
+            <span class="badge bg-emerald-50 text-emerald-700 border-emerald-200">Remote</span>
+            {% endif %}
+            {% if opportunity.days_left is not None and opportunity.days_left <= 7 and opportunity.days_left > 0 %}
+            <span class="badge bg-red-50 text-red-700 border-red-200">{{ opportunity.days_left }}d left</span>
+            {% endif %}
+        </div>
+
+        {% if user.is_authenticated %}
+        <div id="bookmark-btn-{{ opportunity.id }}">
+            {% include "bookmarks/partials/bookmark_button.html" %}
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Organization -->
+    <div class="flex items-center gap-2 mb-3">
+        <div class="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center overflow-hidden shrink-0">
+            {% if opportunity.organization.logo %}
+                <img src="{{ opportunity.organization.logo.url }}" alt="" class="w-6 h-6 object-contain">
+            {% else %}
+                <svg class="w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2M5 21h2m0 0h10M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 8v-4a1 1 0 011-1h2a1 1 0 011 1v4"/>
+                </svg>
+            {% endif %}
+        </div>
+        <div class="flex items-center gap-1 min-w-0">
+            <span class="text-sm text-gray-600 truncate">
+                {{ opportunity.organization.name|default:"Unknown Organization" }}
+            </span>
+            {% if opportunity.organization.verified %}
+            <svg class="w-3.5 h-3.5 text-blue-500 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+            </svg>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Title -->
+    <h3 class="font-semibold text-navy text-base mb-2 line-clamp-2 group-hover:text-amber-dark transition-colors">
+        {{ opportunity.title }}
+    </h3>
+
+    {% if opportunity.short_description %}
+    <p class="text-sm text-gray-500 mb-3 line-clamp-2">{{ opportunity.short_description }}</p>
+    {% endif %}
+
+    <!-- Details row -->
+    <div class="flex flex-wrap items-center gap-3 text-xs text-gray-500 mb-3">
+        {% if opportunity.location %}
+        <span class="flex items-center gap-1">
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+            {{ opportunity.location }}
+        </span>
+        {% endif %}
+        <span class="flex items-center gap-1">
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            {{ opportunity.deadline|date:"M d, Y" }}
+        </span>
+        {% if opportunity.salary_min or opportunity.salary_max %}
+        <span class="flex items-center gap-1">
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
+            </svg>
+            {{ opportunity.salary_currency }} {{ opportunity.salary_min|intcomma }}{% if opportunity.salary_max %} - {{ opportunity.salary_max|intcomma }}{% endif %}
+        </span>
+        {% elif opportunity.funding_amount %}
+        <span class="flex items-center gap-1">{{ opportunity.funding_amount }}</span>
+        {% endif %}
+    </div>
+
+    <!-- Tags -->
+    {% if opportunity.tags.all %}
+    <div class="flex flex-wrap gap-1.5">
+        {% for tag in opportunity.tags.all|slice:":3" %}
+        <span class="px-2 py-0.5 bg-gray-50 text-gray-600 text-xs rounded-full">{{ tag.name }}</span>
+        {% endfor %}
+    </div>
+    {% endif %}
+</a>

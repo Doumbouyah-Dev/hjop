@@ -1,0 +1,70 @@
+<div class="space-y-6">
+    <!-- Category -->
+    <div>
+        <h4 class="text-sm font-semibold text-gray-900 mb-3">Category</h4>
+        <div class="space-y-1">
+            {% for cat in categories %}
+            <button type="button"
+                onclick="setFilter('category', '{{ cat.slug }}', document.getElementById('hidden-category').value === '{{ cat.slug }}' ? '' : '{{ cat.slug }}')"
+                class="flex items-center gap-2 w-full px-2 py-1.5 rounded-lg text-sm transition-colors text-left
+                {% if current_category == cat.slug %}bg-amber/10 text-amber-dark font-medium{% else %}text-gray-600 hover:bg-gray-50{% endif %}">
+                {{ cat.name }}
+            </button>
+            {% endfor %}
+        </div>
+    </div>
+
+    <hr class="border-gray-100">
+
+    <!-- Type -->
+    <div>
+        <h4 class="text-sm font-semibold text-gray-900 mb-3">Type</h4>
+        <div class="space-y-1">
+            {% for value, label in opportunity_types %}
+            <button type="button"
+                onclick="setFilter('type', '{{ value }}', document.getElementById('hidden-type').value === '{{ value }}' ? '' : '{{ value }}')"
+                class="block w-full text-left px-2 py-1.5 rounded-lg text-sm transition-colors
+                {% if current_type == value %}bg-amber/10 text-amber-dark font-medium{% else %}text-gray-600 hover:bg-gray-50{% endif %}">
+                {{ label }}
+            </button>
+            {% endfor %}
+        </div>
+    </div>
+
+    <hr class="border-gray-100">
+
+    <!-- Experience -->
+    <div>
+        <h4 class="text-sm font-semibold text-gray-900 mb-3">Experience</h4>
+        <div class="space-y-1">
+            {% for value, label in experience_levels %}
+            <button type="button"
+                onclick="setFilter('experience', '{{ value }}', document.getElementById('hidden-experience').value === '{{ value }}' ? '' : '{{ value }}')"
+                class="block w-full text-left px-2 py-1.5 rounded-lg text-sm transition-colors
+                {% if current_experience == value %}bg-amber/10 text-amber-dark font-medium{% else %}text-gray-600 hover:bg-gray-50{% endif %}">
+                {{ label }}
+            </button>
+            {% endfor %}
+        </div>
+    </div>
+
+    <hr class="border-gray-100">
+
+    <!-- Remote toggle -->
+    <label class="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+        <input type="checkbox" name="remote" value="1" {% if current_remote %}checked{% endif %}
+               form="filter-form" class="rounded border-gray-300 text-amber focus:ring-amber">
+        Remote only
+    </label>
+</div>
+
+<script>
+    // Sets (or clears, if already active — toggle behavior) a hidden field
+    // then submits the filter form via HTMX. Kept as plain JS rather than
+    // Alpine since it needs to interoperate with the form's hx-trigger.
+    function setFilter(field, clickedValue, newValue) {
+        const hidden = document.getElementById('hidden-' + field);
+        hidden.value = newValue;
+        htmx.trigger('#filter-form', 'submit');
+    }
+</script>

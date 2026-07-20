@@ -1,0 +1,74 @@
+{% load bookmark_tags %}
+
+<!-- Active filter chips -->
+{% if current_search or current_category or current_country or current_type or current_experience or current_remote %}
+<div class="flex flex-wrap items-center gap-2 mb-6">
+    {% if current_search %}
+    <span class="badge bg-gray-100 text-gray-700 border-gray-200">Search: {{ current_search }}</span>
+    {% endif %}
+    {% if current_category %}
+    <span class="badge bg-gray-100 text-gray-700 border-gray-200">{{ current_category }}</span>
+    {% endif %}
+    {% if current_type %}
+    <span class="badge bg-gray-100 text-gray-700 border-gray-200">{{ current_type }}</span>
+    {% endif %}
+    {% if current_experience %}
+    <span class="badge bg-gray-100 text-gray-700 border-gray-200">{{ current_experience }}</span>
+    {% endif %}
+    {% if current_remote %}
+    <span class="badge bg-gray-100 text-gray-700 border-gray-200">Remote only</span>
+    {% endif %}
+    <a href="{% url 'opportunities:list' %}"
+       hx-get="{% url 'opportunities:list' %}" hx-target="#results-container" hx-push-url="true"
+       class="text-sm text-amber-dark hover:underline font-medium">
+        Clear all
+    </a>
+</div>
+{% endif %}
+
+<!-- Out-of-band swap: keeps the "(N results)" heading in sync even though
+     it lives outside #results-container -->
+<span id="result-count-heading" hx-swap-oob="true" class="text-lg font-normal text-gray-500 ml-2">
+    ({{ total_count }} results)
+</span>
+
+{% if page_obj.object_list %}
+<div class="grid sm:grid-cols-2 gap-6">
+    {% for opportunity in page_obj %}
+        {% include "opportunities/partials/card.html" %}
+    {% endfor %}
+</div>
+
+<!-- Pagination -->
+{% if page_obj.has_other_pages %}
+<div class="flex justify-center items-center gap-2 mt-10">
+    {% if page_obj.has_previous %}
+    <button hx-get="{% url 'opportunities:list' %}?page={{ page_obj.previous_page_number }}"
+            hx-include="#filter-form" hx-target="#results-container" hx-push-url="true"
+            class="btn-outline text-sm px-3 py-1.5">Previous</button>
+    {% endif %}
+
+    <span class="text-sm text-gray-500 px-3">
+        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+    </span>
+
+    {% if page_obj.has_next %}
+    <button hx-get="{% url 'opportunities:list' %}?page={{ page_obj.next_page_number }}"
+            hx-include="#filter-form" hx-target="#results-container" hx-push-url="true"
+            class="btn-outline text-sm px-3 py-1.5">Next</button>
+    {% endif %}
+</div>
+{% endif %}
+
+{% else %}
+<div class="text-center py-16">
+    <svg class="w-12 h-12 text-gray-300 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z"/>
+    </svg>
+    <h3 class="text-xl font-semibold text-gray-900 mb-2">No opportunities found</h3>
+    <p class="text-gray-500 mb-4">Try adjusting your filters or search terms</p>
+    <a href="{% url 'opportunities:list' %}"
+       hx-get="{% url 'opportunities:list' %}" hx-target="#results-container" hx-push-url="true"
+       class="btn-outline">Clear Filters</a>
+</div>
+{% endif %}

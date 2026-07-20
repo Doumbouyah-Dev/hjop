@@ -53,9 +53,9 @@ INSTALLED_APPS = [
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
-     "allauth.socialaccount.providers.google",
-    # We'll add specific OAuth providers in Phase 4
-
+    "allauth.socialaccount.providers.google",
+    "django.contrib.humanize", 
+    
     # Local apps
     "apps.accounts",
     "apps.core",

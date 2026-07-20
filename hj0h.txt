@@ -1,0 +1,14 @@
+(venv) [hjop]> python manage.py createsuperuser
+Username: hjoh_1
+Email: hjoh_1@hjoh.com
+Password:MandingFakoli3792.
+
+
+(venv) [hjop]> python manage.py createsuperuser
+Email: hjoh_2@hjoh.com
+Password:MandingFakoli3792.
+
+
+
+Google cloud client ID: 676885518230-h443fbp7f1ks3qjrv3gi20hb0jj4436a.apps.googleusercontent.com
+Secrete Client ID: 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

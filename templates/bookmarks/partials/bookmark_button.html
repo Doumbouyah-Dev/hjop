@@ -1,0 +1,13 @@
+{% load bookmark_tags %}
+<button
+    hx-post="{% url 'bookmarks:toggle' opportunity.id %}"
+    hx-target="#bookmark-btn-{{ opportunity.id }}"
+    hx-swap="innerHTML"
+    onclick="event.preventDefault(); event.stopPropagation();"
+    class="p-1.5 rounded-lg hover:bg-gray-100 transition-colors shrink-0">
+    {% is_bookmarked opportunity user as bookmarked %}
+    <svg class="w-4 h-4 {% if bookmarked %}fill-amber text-amber{% else %}text-gray-400{% endif %}"
+         fill="{% if bookmarked %}currentColor{% else %}none{% endif %}" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
+    </svg>
+</button>

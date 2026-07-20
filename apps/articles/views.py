@@ -1,5 +1,4 @@
 from django.http import HttpResponse
 
-
-def article_list(request):
-    return HttpResponse("Articles list — built in Phase 11.")
+def detail_placeholder(request, slug):
+    return HttpResponse(f"Article detail for '{slug}' — built in Phase 11.")

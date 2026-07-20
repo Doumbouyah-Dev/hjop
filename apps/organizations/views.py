@@ -1,5 +1,4 @@
 from django.http import HttpResponse
 
-
-def organization_list(request):
-    return HttpResponse("Organizations list — built in Phase 10.")
+def post_opportunity(request):
+    return HttpResponse("Post opportunity wizard — built in Phase 10.")
