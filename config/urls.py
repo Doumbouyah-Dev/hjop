@@ -6,13 +6,14 @@ from django.conf.urls.static import static
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("accounts/", include("allauth.urls")),
-    
+
     path("", include("apps.core.urls")),
     path("opportunities/", include("apps.opportunities.urls")),
     path("organizations/", include("apps.organizations.urls")),
     path("dashboard/", include("apps.dashboard.urls")),
     path("articles/", include("apps.articles.urls")),
     path("bookmarks/", include("apps.bookmarks.urls")),
+    path("applications/", include("apps.applications.urls")),
 ]
 
 if settings.DEBUG:

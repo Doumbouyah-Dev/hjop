@@ -72,3 +72,6 @@
        class="btn-outline">Clear Filters</a>
 </div>
 {% endif %}
+{% if current_category_obj %}
+<span class="badge bg-gray-100 text-gray-700 border-gray-200">{{ current_category_obj.name }}</span>
+{% endif %}

@@ -48,7 +48,7 @@ class Migration(migrations.Migration):
                 ('application_link', models.URLField(blank=True)),
                 ('application_email', models.EmailField(blank=True, max_length=254)),
                 ('application_instructions', models.TextField(blank=True)),
-                ('max_applicants', models.PositiveIntegerField(blank=True, null=True)),
+                ('max_users', models.PositiveIntegerField(blank=True, null=True)),
                 ('seo_title', models.CharField(blank=True, max_length=70)),
                 ('seo_description', models.CharField(blank=True, max_length=160)),
                 ('status', models.CharField(choices=[('draft', 'Draft'), ('active', 'Active'), ('paused', 'Paused'), ('expired', 'Expired'), ('closed', 'Closed')], default='draft', max_length=20)),

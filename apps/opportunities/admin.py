@@ -73,7 +73,7 @@ class OpportunityAdmin(admin.ModelAdmin):
         ("Application", {
             "fields": (
                 "application_link", "application_email",
-                "application_instructions", "max_applicants",
+                "application_instructions", "max_users",
             )
         }),
         ("Tags & SEO", {"fields": ("tags", "seo_title", "seo_description")}),

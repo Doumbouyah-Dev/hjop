@@ -16,10 +16,10 @@ SORT_OPTIONS = {
 
 
 def _filtered_queryset(request):
-    qs = Opportunity.objects.filter(status="active").select_related("organization")
+    qs = Opportunity.objects.filter(status="active").select_related("organization", "category")
 
     search = request.GET.get("search", "").strip()
-    category = request.GET.get("category", "")
+    category_slug = request.GET.get("category", "")
     country = request.GET.get("country", "")
     opportunity_type = request.GET.get("type", "")
     experience = request.GET.get("experience", "")
@@ -32,8 +32,8 @@ def _filtered_queryset(request):
             Q(short_description__icontains=search) |
             Q(organization__name__icontains=search)
         )
-    if category:
-        qs = qs.filter(category=category)
+    if category_slug:
+        qs = qs.filter(category__slug=category_slug)
     if country:
         qs = qs.filter(country__iexact=country)
     if opportunity_type:
@@ -62,7 +62,6 @@ def list_view(request):
         "opportunity_types": Opportunity.Type.choices,
         "experience_levels": Opportunity.ExperienceLevel.choices,
         "total_count": paginator.count,
-        # Preserve current filter state so the template can re-select active options
         "current_search": request.GET.get("search", ""),
         "current_category": request.GET.get("category", ""),
         "current_country": request.GET.get("country", ""),
@@ -70,10 +69,9 @@ def list_view(request):
         "current_experience": request.GET.get("experience", ""),
         "current_remote": request.GET.get("remote") == "1",
         "current_sort": request.GET.get("sort", "recent"),
+        "current_category_obj": Category.objects.filter(slug=request.GET.get("category", "")).first(),
     }
 
-    # HTMX partial request → return only the results grid + pagination,
-    # not the whole page (this is what makes filtering feel instant)
     if request.htmx:
         return render(request, "opportunities/partials/results.html", context)
 
@@ -82,22 +80,20 @@ def list_view(request):
 
 def detail_view(request, slug):
     opportunity = get_object_or_404(
-        Opportunity.objects.select_related("organization"), slug=slug
+        Opportunity.objects.select_related("organization", "category"), slug=slug
     )
 
-    # Increment views (simple approach for now; revisit with async/batched
-    # counters in the Scalability hardening pass if traffic demands it)
     Opportunity.objects.filter(pk=opportunity.pk).update(views=opportunity.views + 1)
 
     already_applied = False
     if request.user.is_authenticated:
         already_applied = Application.objects.filter(
-            opportunity=opportunity, applicant=request.user
+            opportunity=opportunity, user=request.user
         ).exists()
 
     related = Opportunity.objects.filter(
         category=opportunity.category, status="active"
-    ).exclude(pk=opportunity.pk).select_related("organization")[:3]
+    ).exclude(pk=opportunity.pk).select_related("organization", "category")[:3]
 
     context = {
         "opportunity": opportunity,

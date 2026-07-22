@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Apply — {{ opportunity.title }}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50/50 py-8">
+    <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        <div class="flex items-center gap-2 text-sm text-gray-500 mb-6">
+            <a href="{% url 'opportunities:detail' opportunity.slug %}" class="hover:text-amber-dark flex items-center gap-1">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                </svg>
+                Back to opportunity
+            </a>
+        </div>
+
+        <div class="bg-white rounded-xl border border-gray-100 p-6 sm:p-8">
+            <h1 class="text-2xl font-bold text-navy mb-1">Apply for this Opportunity</h1>
+            <p class="text-gray-500 mb-6">{{ opportunity.title }} at {{ opportunity.organization.name|default:"Unknown Organization" }}</p>
+
+            <form method="post" enctype="multipart/form-data" class="space-y-5">
+                {% csrf_token %}
+
+                <div>
+                    <label class="form-label">{{ form.cover_letter.label }}</label>
+                    {{ form.cover_letter }}
+                    {% for error in form.cover_letter.errors %}
+                        <p class="text-red-500 text-xs mt-1">{{ error }}</p>
+                    {% endfor %}
+                </div>
+
+                <div>
+                    <label class="form-label">{{ form.resume.label }}</label>
+                    {{ form.resume }}
+                    <p class="text-xs text-gray-400 mt-1">PDF, DOC, or DOCX — max 5MB</p>
+                    {% for error in form.resume.errors %}
+                        <p class="text-red-500 text-xs mt-1">{{ error }}</p>
+                    {% endfor %}
+                </div>
+
+                <div>
+                    <label class="form-label">{{ form.portfolio_url.label }}</label>
+                    {{ form.portfolio_url }}
+                    {% for error in form.portfolio_url.errors %}
+                        <p class="text-red-500 text-xs mt-1">{{ error }}</p>
+                    {% endfor %}
+                </div>
+
+                {% if opportunity.application_email %}
+                <div class="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 text-sm text-blue-700">
+                    You can also apply directly via email:
+                    <a href="mailto:{{ opportunity.application_email }}" class="font-medium underline">
+                        {{ opportunity.application_email }}
+                    </a>
+                </div>
+                {% endif %}
+
+                {% if form.non_field_errors %}
+                <div class="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3">
+                    {{ form.non_field_errors }}
+                </div>
+                {% endif %}
+
+                <button type="submit" class="btn-primary w-full h-11 text-base">
+                    Submit Application
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

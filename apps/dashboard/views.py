@@ -22,3 +22,7 @@ def saved(request):
 @login_required
 def profile(request):
     return HttpResponse("Profile — built in Phase 9.")
+
+@login_required
+def applications(request):
+    return HttpResponse("My Applications — built in Phase 9.")
