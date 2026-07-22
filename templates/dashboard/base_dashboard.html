@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50/50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="flex flex-col lg:flex-row gap-8">
+
+            <!-- Sidebar -->
+            <aside class="lg:w-64 shrink-0">
+                <div class="lg:sticky lg:top-24 space-y-6">
+
+                    <!-- User card -->
+                    <div class="bg-white rounded-xl border border-gray-100 p-5">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-12 h-12 rounded-full bg-navy flex items-center justify-center text-white font-semibold overflow-hidden shrink-0">
+                                {% if user.avatar %}
+                                    <img src="{{ user.avatar.url }}" alt="" class="w-full h-full object-cover">
+                                {% else %}
+                                    {{ user.email|first|upper }}
+                                {% endif %}
+                            </div>
+                            <div class="min-w-0">
+                                <p class="font-semibold text-navy truncate">{{ user.get_full_name|default:user.email }}</p>
+                                <p class="text-xs text-gray-500 capitalize">{{ user.get_role_display }}</p>
+                            </div>
+                        </div>
+
+                        <div class="mb-1">
+                            <div class="flex items-center justify-between text-xs mb-1">
+                                <span class="text-gray-500">Profile completion</span>
+                                <span class="font-medium text-amber-dark">{{ user.profile_complete_percent }}%</span>
+                            </div>
+                            <div class="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
+                                <div class="bg-amber h-full rounded-full transition-all" style="width: {{ user.profile_complete_percent }}%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Navigation -->
+                    <nav class="bg-white rounded-xl border border-gray-100 p-2">
+                        <a href="{% url 'dashboard:home' %}"
+                           class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors
+                           {% if active_tab == 'home' %}bg-amber/10 text-amber-dark{% else %}text-gray-600 hover:bg-gray-50 hover:text-navy{% endif %}">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                            </svg>
+                            Dashboard
+                        </a>
+                        <a href="{% url 'dashboard:saved' %}"
+                           class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors
+                           {% if active_tab == 'saved' %}bg-amber/10 text-amber-dark{% else %}text-gray-600 hover:bg-gray-50 hover:text-navy{% endif %}">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
+                            </svg>
+                            Saved Opportunities
+                        </a>
+                        <a href="{% url 'dashboard:applications' %}"
+                           class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors
+                           {% if active_tab == 'applications' %}bg-amber/10 text-amber-dark{% else %}text-gray-600 hover:bg-gray-50 hover:text-navy{% endif %}">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                            </svg>
+                            My Applications
+                        </a>
+                        <a href="{% url 'dashboard:profile' %}"
+                           class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors
+                           {% if active_tab == 'profile' %}bg-amber/10 text-amber-dark{% else %}text-gray-600 hover:bg-gray-50 hover:text-navy{% endif %}">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                            </svg>
+                            Profile
+                        </a>
+                    </nav>
+
+                    {% if user.role == "employer" %}
+                    <a href="{% url 'organizations:post_opportunity' %}" class="btn-primary w-full">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                        </svg>
+                        Post Opportunity
+                    </a>
+                    {% endif %}
+                </div>
+            </aside>
+
+            <!-- Main Content -->
+            <div class="flex-1 min-w-0">
+                {% block dashboard_content %}{% endblock %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

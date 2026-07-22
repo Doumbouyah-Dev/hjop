@@ -1,0 +1,110 @@
+{% extends "dashboard/base_dashboard.html" %}
+
+{% block dashboard_content %}
+<div class="space-y-6">
+    <div>
+        <h1 class="text-2xl font-bold text-navy mb-1">My Profile</h1>
+        <p class="text-gray-500">Update your personal information and preferences</p>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" class="bg-white rounded-xl border border-gray-100 p-6 space-y-6">
+        {% csrf_token %}
+
+        <!-- Personal Info -->
+        <div>
+            <h3 class="font-semibold text-navy mb-4">Personal Information</h3>
+            <div class="grid sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="form-label">First Name</label>
+                    {{ form.first_name }}
+                    {% for error in form.first_name.errors %}<p class="text-red-500 text-xs mt-1">{{ error }}</p>{% endfor %}
+                </div>
+                <div>
+                    <label class="form-label">Last Name</label>
+                    {{ form.last_name }}
+                    {% for error in form.last_name.errors %}<p class="text-red-500 text-xs mt-1">{{ error }}</p>{% endfor %}
+                </div>
+                <div class="sm:col-span-2">
+                    <label class="form-label">Profile Photo</label>
+                    {{ form.avatar }}
+                    {% for error in form.avatar.errors %}<p class="text-red-500 text-xs mt-1">{{ error }}</p>{% endfor %}
+                </div>
+                <div class="sm:col-span-2">
+                    <label class="form-label">Bio</label>
+                    {{ form.bio }}
+                    {% for error in form.bio.errors %}<p class="text-red-500 text-xs mt-1">{{ error }}</p>{% endfor %}
+                </div>
+                <div>
+                    <label class="form-label">Phone</label>
+                    {{ form.phone }}
+                </div>
+                <div>
+                    <label class="form-label">Location</label>
+                    {{ form.location }}
+                </div>
+                <div>
+                    <label class="form-label">County (Liberia)</label>
+                    {{ form.county }}
+                </div>
+            </div>
+        </div>
+
+        <hr class="border-gray-100">
+
+        <!-- Professional -->
+        <div>
+            <h3 class="font-semibold text-navy mb-4">Professional Information</h3>
+            <div class="grid sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="form-label">Education Level</label>
+                    {{ form.education_level }}
+                </div>
+                <div>
+                    <label class="form-label">Field of Study</label>
+                    {{ form.field_of_study }}
+                </div>
+                <div>
+                    <label class="form-label">Years of Experience</label>
+                    {{ form.years_of_experience }}
+                </div>
+                <div>
+                    <label class="form-label">Resume / CV</label>
+                    {{ form.resume }}
+                    {% for error in form.resume.errors %}<p class="text-red-500 text-xs mt-1">{{ error }}</p>{% endfor %}
+                    {% if user.resume %}
+                    <a href="{{ user.resume.url }}" target="_blank" class="text-xs text-amber-dark hover:underline mt-1 inline-block">
+                        View current resume
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <hr class="border-gray-100">
+
+        <!-- Online Presence -->
+        <div>
+            <h3 class="font-semibold text-navy mb-4">Online Presence</h3>
+            <div class="grid sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="form-label">Website</label>
+                    {{ form.website }}
+                </div>
+                <div>
+                    <label class="form-label">LinkedIn</label>
+                    {{ form.linkedin }}
+                </div>
+            </div>
+        </div>
+
+        <div class="flex justify-end">
+            <button type="submit" class="btn-primary">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/>
+                </svg>
+                Save Changes
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

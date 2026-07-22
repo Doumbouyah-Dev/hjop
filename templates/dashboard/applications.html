@@ -1,0 +1,95 @@
+{% extends "dashboard/base_dashboard.html" %}
+
+{% block dashboard_content %}
+<div class="space-y-6">
+    <div class="flex items-center justify-between flex-wrap gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-navy mb-1">My Applications</h1>
+            <p class="text-gray-500">Track all your applications in one place</p>
+        </div>
+
+        <select onchange="window.location.href = this.value ? '?status=' + this.value : '{% url 'dashboard:applications' %}'"
+                class="form-input w-48">
+            <option value="">All Statuses</option>
+            {% for value, label in status_choices %}
+            <option value="{{ value }}" {% if current_status == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    {% if not page_obj.object_list %}
+    <div class="bg-white rounded-xl border border-gray-100 p-12 text-center">
+        <svg class="w-12 h-12 text-gray-300 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+        </svg>
+        <h3 class="text-lg font-semibold text-gray-900 mb-2">No applications found</h3>
+        <p class="text-gray-500 mb-4">
+            {% if current_status %}No applications with this status.{% else %}Start applying to opportunities to see them here.{% endif %}
+        </p>
+        <a href="{% url 'opportunities:list' %}" class="btn-primary">Browse Opportunities</a>
+    </div>
+    {% else %}
+    <div class="space-y-3">
+        {% for application in page_obj %}
+        <div class="bg-white rounded-xl border border-gray-100 p-5">
+            <div class="flex items-start justify-between gap-4">
+                <a href="{% url 'opportunities:detail' application.opportunity.slug %}" class="flex-1 min-w-0 group">
+                    <h3 class="font-semibold text-navy truncate group-hover:text-amber-dark transition-colors">
+                        {{ application.opportunity.title }}
+                    </h3>
+                    <p class="text-sm text-gray-500 mb-2">{{ application.opportunity.organization.name|default:"Unknown Organization" }}</p>
+                    <div class="flex flex-wrap items-center gap-3 text-xs text-gray-500">
+                        <span class="flex items-center gap-1">
+                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                            Applied {{ application.applied_at|date:"M d, Y" }}
+                        </span>
+                        <span class="flex items-center gap-1">
+                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            Updated {{ application.updated_at|date:"M d, Y" }}
+                        </span>
+                    </div>
+                </a>
+
+                <div class="flex flex-col items-end gap-2 shrink-0">
+                    <span class="badge
+                        {% if application.status == 'applied' %}bg-blue-50 text-blue-700 border-blue-200
+                        {% elif application.status == 'viewed' %}bg-purple-50 text-purple-700 border-purple-200
+                        {% elif application.status == 'shortlisted' %}bg-amber/10 text-amber-dark border-amber/20
+                        {% elif application.status == 'interview' %}bg-indigo-50 text-indigo-700 border-indigo-200
+                        {% elif application.status == 'accepted' %}bg-green-50 text-green-700 border-green-200
+                        {% elif application.status == 'rejected' %}bg-red-50 text-red-700 border-red-200
+                        {% else %}bg-gray-50 text-gray-600 border-gray-200{% endif %}">
+                        {{ application.get_status_display }}
+                    </span>
+
+                    {% if application.status != "withdrawn" and application.status != "accepted" and application.status != "rejected" %}
+                    <form method="post" action="{% url 'applications:withdraw' application.pk %}"
+                          onsubmit="return confirm('Withdraw this application? This cannot be undone.');">
+                        {% csrf_token %}
+                        <button type="submit" class="text-xs text-red-500 hover:underline">Withdraw</button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if page_obj.has_other_pages %}
+    <div class="flex justify-center items-center gap-2 mt-6">
+        {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}{% if current_status %}&status={{ current_status }}{% endif %}" class="btn-outline text-sm px-3 py-1.5">Previous</a>
+        {% endif %}
+        <span class="text-sm text-gray-500 px-3">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}{% if current_status %}&status={{ current_status }}{% endif %}" class="btn-outline text-sm px-3 py-1.5">Next</a>
+        {% endif %}
+    </div>
+    {% endif %}
+    {% endif %}
+</div>
+{% endblock %}

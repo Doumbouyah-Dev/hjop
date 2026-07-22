@@ -1,0 +1,134 @@
+{% extends "dashboard/base_dashboard.html" %}
+
+{% block dashboard_content %}
+<div class="space-y-6">
+
+    <div class="bg-white rounded-xl border border-gray-100 p-6">
+        <h1 class="text-2xl font-bold text-navy mb-1">Welcome back, {{ user.first_name|default:user.email }}!</h1>
+        <p class="text-gray-500">Here's what's happening with your opportunities</p>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-white rounded-xl border border-gray-100 p-5">
+            <div class="w-10 h-10 rounded-lg bg-amber-50 flex items-center justify-center mb-3">
+                <svg class="w-5 h-5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
+                </svg>
+            </div>
+            <p class="text-2xl font-bold text-navy">{{ stats.saved }}</p>
+            <p class="text-sm text-gray-500">Saved</p>
+        </div>
+        <div class="bg-white rounded-xl border border-gray-100 p-5">
+            <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center mb-3">
+                <svg class="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/>
+                </svg>
+            </div>
+            <p class="text-2xl font-bold text-navy">{{ stats.applied }}</p>
+            <p class="text-sm text-gray-500">Applied</p>
+        </div>
+        <div class="bg-white rounded-xl border border-gray-100 p-5">
+            <div class="w-10 h-10 rounded-lg bg-purple-50 flex items-center justify-center mb-3">
+                <svg class="w-5 h-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+            </div>
+            <p class="text-2xl font-bold text-navy">{{ stats.interviews }}</p>
+            <p class="text-sm text-gray-500">Interviews</p>
+        </div>
+        <div class="bg-white rounded-xl border border-gray-100 p-5">
+            <div class="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center mb-3">
+                <svg class="w-5 h-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                </svg>
+            </div>
+            <p class="text-2xl font-bold text-navy">{{ stats.accepted }}</p>
+            <p class="text-sm text-gray-500">Accepted</p>
+        </div>
+    </div>
+
+    <div class="grid lg:grid-cols-2 gap-6">
+        <!-- Recent Applications -->
+        <div class="bg-white rounded-xl border border-gray-100 p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="font-semibold text-navy">Recent Applications</h2>
+                <a href="{% url 'dashboard:applications' %}" class="text-sm text-amber-dark hover:underline flex items-center gap-1">
+                    View all
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </a>
+            </div>
+
+            {% if not recent_applications %}
+            <div class="text-center py-8">
+                <p class="text-gray-500 text-sm mb-1">No applications yet</p>
+                <a href="{% url 'opportunities:list' %}" class="text-amber-dark text-sm hover:underline">Browse opportunities</a>
+            </div>
+            {% else %}
+            <div class="space-y-3">
+                {% for app in recent_applications %}
+                <a href="{% url 'opportunities:detail' app.opportunity.slug %}"
+                   class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                    <div class="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center shrink-0"></div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-medium text-navy truncate">{{ app.opportunity.title }}</p>
+                        <p class="text-xs text-gray-500">{{ app.opportunity.organization.name|default:"Unknown" }}</p>
+                    </div>
+                    <span class="badge
+                        {% if app.status == 'applied' %}bg-blue-50 text-blue-700
+                        {% elif app.status == 'shortlisted' %}bg-amber/10 text-amber-dark
+                        {% elif app.status == 'accepted' %}bg-green-50 text-green-700
+                        {% elif app.status == 'rejected' %}bg-red-50 text-red-700
+                        {% else %}bg-gray-50 text-gray-600{% endif %} border-transparent shrink-0">
+                        {{ app.get_status_display }}
+                    </span>
+                </a>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Saved Opportunities -->
+        <div class="bg-white rounded-xl border border-gray-100 p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="font-semibold text-navy">Saved Opportunities</h2>
+                <a href="{% url 'dashboard:saved' %}" class="text-sm text-amber-dark hover:underline flex items-center gap-1">
+                    View all
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </a>
+            </div>
+
+            {% if not recent_bookmarks %}
+            <div class="text-center py-8">
+                <p class="text-gray-500 text-sm mb-1">No saved opportunities</p>
+                <a href="{% url 'opportunities:list' %}" class="text-amber-dark text-sm hover:underline">Browse opportunities</a>
+            </div>
+            {% else %}
+            <div class="space-y-3">
+                {% for bookmark in recent_bookmarks %}
+                <a href="{% url 'opportunities:detail' bookmark.opportunity.slug %}"
+                   class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                    <div class="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center shrink-0">
+                        <svg class="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
+                        </svg>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-medium text-navy truncate">{{ bookmark.opportunity.title }}</p>
+                        <p class="text-xs text-gray-500">{{ bookmark.opportunity.organization.name|default:"Unknown" }}</p>
+                    </div>
+                    <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </a>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

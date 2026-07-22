@@ -1,0 +1,41 @@
+{% extends "dashboard/base_dashboard.html" %}
+
+{% block dashboard_content %}
+<div class="space-y-6">
+    <div>
+        <h1 class="text-2xl font-bold text-navy mb-1">Saved Opportunities</h1>
+        <p class="text-gray-500">Manage your bookmarked opportunities</p>
+    </div>
+
+    {% if not page_obj.object_list %}
+    <div class="bg-white rounded-xl border border-gray-100 p-12 text-center">
+        <svg class="w-12 h-12 text-gray-300 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
+        </svg>
+        <h3 class="text-lg font-semibold text-gray-900 mb-2">No saved opportunities</h3>
+        <p class="text-gray-500 mb-4">Start browsing and save opportunities that interest you</p>
+        <a href="{% url 'opportunities:list' %}" class="btn-primary">Browse Opportunities</a>
+    </div>
+    {% else %}
+    <div class="grid sm:grid-cols-2 gap-6">
+        {% for bookmark in page_obj %}
+            {% with opportunity=bookmark.opportunity %}
+                {% include "opportunities/partials/card.html" %}
+            {% endwith %}
+        {% endfor %}
+    </div>
+
+    {% if page_obj.has_other_pages %}
+    <div class="flex justify-center items-center gap-2 mt-6">
+        {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}" class="btn-outline text-sm px-3 py-1.5">Previous</a>
+        {% endif %}
+        <span class="text-sm text-gray-500 px-3">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}" class="btn-outline text-sm px-3 py-1.5">Next</a>
+        {% endif %}
+    </div>
+    {% endif %}
+    {% endif %}
+</div>
+{% endblock %}
