@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Organizations — HJ Opportunity Hub{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50/50 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        <div class="flex items-center justify-between mb-6 flex-wrap gap-4">
+            <h1 class="text-3xl font-bold text-navy">Organizations</h1>
+            <select onchange="window.location.href = this.value ? '?type=' + this.value : '{% url 'organizations:list' %}'"
+                    class="form-input w-56">
+                <option value="">All Types</option>
+                {% for value, label in org_types %}
+                <option value="{{ value }}" {% if current_type == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for org in page_obj %}
+            <a href="{% url 'organizations:detail' org.slug %}" class="card block">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center overflow-hidden shrink-0">
+                        {% if org.logo %}
+                            <img src="{{ org.logo.url }}" class="w-8 h-8 object-contain">
+                        {% endif %}
+                    </div>
+                    <div class="min-w-0">
+                        <div class="flex items-center gap-1">
+                            <span class="font-semibold text-navy truncate">{{ org.name }}</span>
+                            {% if org.verified %}
+                            <svg class="w-4 h-4 text-blue-500 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                            {% endif %}
+                        </div>
+                        <span class="text-xs text-gray-500">{{ org.get_org_type_display }}</span>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-500 line-clamp-2 mb-3">{{ org.description|default:"No description provided." }}</p>
+                <span class="text-xs text-gray-400">{{ org.country }}</span>
+            </a>
+            {% empty %}
+            <p class="text-gray-500 col-span-full text-center py-12">No organizations found.</p>
+            {% endfor %}
+        </div>
+
+        {% if page_obj.has_other_pages %}
+        <div class="flex justify-center items-center gap-2 mt-8">
+            {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}" class="btn-outline text-sm px-3 py-1.5">Previous</a>{% endif %}
+            <span class="text-sm text-gray-500 px-3">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+            {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}" class="btn-outline text-sm px-3 py-1.5">Next</a>{% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

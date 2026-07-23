@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}My Organization — HJ Opportunity Hub{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50/50 py-8">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        <div class="bg-white rounded-xl border border-gray-100 p-6 mb-6">
+            <div class="flex items-center justify-between flex-wrap gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-14 h-14 rounded-xl bg-gray-100 flex items-center justify-center overflow-hidden shrink-0">
+                        {% if organization.logo %}<img src="{{ organization.logo.url }}" class="w-10 h-10 object-contain">{% endif %}
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h1 class="text-xl font-bold text-navy">{{ organization.name }}</h1>
+                            <span class="badge
+                                {% if organization.status == 'active' %}bg-green-50 text-green-700 border-green-200
+                                {% elif organization.status == 'pending' %}bg-amber/10 text-amber-dark border-amber/20
+                                {% else %}bg-red-50 text-red-700 border-red-200{% endif %}">
+                                {{ organization.get_status_display }}
+                            </span>
+                        </div>
+                        <p class="text-sm text-gray-500">{{ organization.get_org_type_display }}</p>
+                    </div>
+                </div>
+                <a href="{% url 'organizations:post_opportunity' %}" class="btn-primary">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                    </svg>
+                    Post New Opportunity
+                </a>
+            </div>
+
+            {% if organization.status == "pending" %}
+            <div class="mt-4 bg-amber/5 border border-amber/20 rounded-lg px-4 py-3 text-sm text-amber-dark">
+                Your organization is pending admin review. You can still draft opportunities, but they won't be publicly visible until your organization is approved.
+            </div>
+            {% endif %}
+        </div>
+
+        <h2 class="text-lg font-semibold text-navy mb-4">Your Opportunities ({{ opportunities.count }})</h2>
+
+        {% if opportunities %}
+        <div class="space-y-3">
+            {% for opp in opportunities %}
+            <div class="bg-white rounded-xl border border-gray-100 p-5 flex items-center justify-between gap-4 flex-wrap">
+                <div class="min-w-0">
+                    <p class="font-semibold text-navy truncate">{{ opp.title }}</p>
+                    <p class="text-sm text-gray-500">
+                        {{ opp.get_category_display }} · {{ opp.applications_count }} application{{ opp.applications_count|pluralize }} ·
+                        {{ opp.views }} view{{ opp.views|pluralize }}
+                    </p>
+                </div>
+                <span class="badge
+                    {% if opp.status == 'active' %}bg-green-50 text-green-700 border-green-200
+                    {% elif opp.status == 'draft' %}bg-gray-50 text-gray-600 border-gray-200
+                    {% elif opp.status == 'expired' %}bg-red-50 text-red-700 border-red-200
+                    {% else %}bg-amber/10 text-amber-dark border-amber/20{% endif %} shrink-0">
+                    {{ opp.get_status_display }}
+                </span>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="bg-white rounded-xl border border-gray-100 p-12 text-center">
+            <p class="text-gray-500 mb-4">You haven't posted any opportunities yet.</p>
+            <a href="{% url 'organizations:post_opportunity' %}" class="btn-primary">Post Your First Opportunity</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

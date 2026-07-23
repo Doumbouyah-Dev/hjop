@@ -11,7 +11,7 @@ from .forms import ProfileForm
 @login_required
 def home(request):
     recent_applications = (
-        Application.objects.filter(applicant=request.user)
+        Application.objects.filter(user=request.user)
         .select_related("opportunity", "opportunity__organization")
         .order_by("-applied_at")[:4]
     )
@@ -23,14 +23,14 @@ def home(request):
 
     stats = {
         "saved": Bookmark.objects.filter(user=request.user).count(),
-        "applied": Application.objects.filter(applicant=request.user).exclude(
+        "applied": Application.objects.filter(user=request.user).exclude(
             status=Application.Status.WITHDRAWN
         ).count(),
         "interviews": Application.objects.filter(
-            applicant=request.user, status=Application.Status.INTERVIEW
+            user=request.user, status=Application.Status.INTERVIEW
         ).count(),
         "accepted": Application.objects.filter(
-            applicant=request.user, status=Application.Status.ACCEPTED
+            user=request.user, status=Application.Status.ACCEPTED
         ).count(),
     }
 
@@ -64,7 +64,7 @@ def applications(request):
     status_filter = request.GET.get("status", "")
 
     apps_qs = (
-        Application.objects.filter(applicant=request.user)
+        Application.objects.filter(user=request.user)
         .select_related("opportunity", "opportunity__organization")
         .order_by("-applied_at")
     )

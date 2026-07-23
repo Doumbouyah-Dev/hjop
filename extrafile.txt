@@ -24,7 +24,7 @@ def apply_view(request, slug):
         messages.info(request, "This opportunity uses an external application process.")
         return redirect("opportunities:detail", slug=opportunity.slug)
 
-    existing = Application.objects.filter(opportunity=opportunity, applicant=request.user).first()
+    existing = Application.objects.filter(opportunity=opportunity, user=request.user).first()
     if existing:
         messages.info(request, "You've already applied to this opportunity.")
         return redirect("opportunities:detail", slug=opportunity.slug)
@@ -38,7 +38,7 @@ def apply_view(request, slug):
         if form.is_valid():
             application = form.save(commit=False)
             application.opportunity = opportunity
-            application.applicant = request.user
+            application.user = request.user
 
             # Reuse profile resume if no file was uploaded for this application
             if not application.resume and request.user.resume:
@@ -88,10 +88,10 @@ def apply_external(request, slug):
         messages.error(request, "This opportunity doesn't have an external application link.")
         return redirect("opportunities:detail", slug=opportunity.slug)
 
-    existing = Application.objects.filter(opportunity=opportunity, applicant=request.user).first()
+    existing = Application.objects.filter(opportunity=opportunity, user=request.user).first()
     if not existing:
         try:
-            Application.objects.create(opportunity=opportunity, applicant=request.user)
+            Application.objects.create(opportunity=opportunity, user=request.user)
             _increment_application_count(opportunity)
         except IntegrityError:
             pass  # already applied — fine, just proceed to redirect
@@ -102,7 +102,7 @@ def apply_external(request, slug):
 @login_required
 @require_POST
 def withdraw_view(request, application_id):
-    application = get_object_or_404(Application, id=application_id, applicant=request.user)
+    application = get_object_or_404(Application, id=application_id, user=request.user)
     application.status = Application.Status.WITHDRAWN
     application.save(update_fields=["status"])
     messages.success(request, "Application withdrawn.")

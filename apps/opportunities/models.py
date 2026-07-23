@@ -1,5 +1,4 @@
-from datetime import timezone
-
+from django.utils import timezone
 from django.conf import settings
 from django.db import models
 from django.urls import reverse
@@ -140,9 +139,11 @@ class Opportunity(models.Model):
     def __str__(self):
         return self.title
 
+    # Inside your Opportunity model (is_expired property)
     @property
     def is_expired(self):
-        from django.utils import timezone
+        if not self.deadline:
+            return False
         return self.deadline < timezone.now().date()
 
     @property
@@ -212,9 +213,10 @@ class Opportunity(models.Model):
 
     def get_absolute_url(self):
         return reverse("opportunities:detail", kwargs={"slug": self.slug})
-
     @property
     def is_expired(self):
+        if not self.deadline:
+            return False
         return self.deadline < timezone.now().date()
 
     @property

@@ -14,6 +14,7 @@ urlpatterns = [
     path("articles/", include("apps.articles.urls")),
     path("bookmarks/", include("apps.bookmarks.urls")),
     path("applications/", include("apps.applications.urls")),
+    path("organizations/", include("apps.organizations.urls")),
 ]
 
 if settings.DEBUG:

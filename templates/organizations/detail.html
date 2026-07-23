@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}{{ organization.name }} — HJ Opportunity Hub{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50/50 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        <!-- Org header -->
+        <div class="bg-white rounded-xl border border-gray-100 p-6 sm:p-8 mb-8">
+            <div class="flex items-start gap-4 flex-wrap">
+                <div class="w-20 h-20 rounded-xl bg-gray-100 flex items-center justify-center overflow-hidden shrink-0">
+                    {% if organization.logo %}
+                        <img src="{{ organization.logo.url }}" class="w-14 h-14 object-contain">
+                    {% endif %}
+                </div>
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <h1 class="text-2xl font-bold text-navy">{{ organization.name }}</h1>
+                        {% if organization.verified %}
+                        <span class="badge bg-blue-50 text-blue-700 border-blue-200">Verified</span>
+                        {% endif %}
+                        {% if organization.featured %}
+                        <span class="badge bg-amber/10 text-amber-dark border-amber/20">Featured</span>
+                        {% endif %}
+                    </div>
+                    <p class="text-gray-500 mt-1">{{ organization.get_org_type_display }} · {{ organization.country }}</p>
+                    <p class="text-gray-600 mt-3 max-w-2xl">{{ organization.description|default:"No description provided." }}</p>
+
+                    <div class="flex flex-wrap gap-4 mt-4 text-sm">
+                        {% if organization.website %}
+                        <a href="{{ organization.website }}" target="_blank" rel="noopener noreferrer" class="text-amber-dark hover:underline flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
+                            </svg>
+                            Website
+                        </a>
+                        {% endif %}
+                        {% if organization.email %}
+                        <a href="mailto:{{ organization.email }}" class="text-gray-500 hover:text-amber-dark flex items-center gap-1">
+                            {{ organization.email }}
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h2 class="text-xl font-bold text-navy mb-6">
+            Open Opportunities <span class="text-base font-normal text-gray-500">({{ total_opportunities }})</span>
+        </h2>
+
+        {% if page_obj.object_list %}
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for opportunity in page_obj %}
+                {% include "opportunities/partials/card.html" %}
+            {% endfor %}
+        </div>
+
+        {% if page_obj.has_other_pages %}
+        <div class="flex justify-center items-center gap-2 mt-8">
+            {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}" class="btn-outline text-sm px-3 py-1.5">Previous</a>{% endif %}
+            <span class="text-sm text-gray-500 px-3">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+            {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}" class="btn-outline text-sm px-3 py-1.5">Next</a>{% endif %}
+        </div>
+        {% endif %}
+        {% else %}
+        <div class="bg-white rounded-xl border border-gray-100 p-12 text-center">
+            <p class="text-gray-500">This organization has no active opportunities right now.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

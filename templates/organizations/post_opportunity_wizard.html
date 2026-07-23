@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}Post an Opportunity — Step {{ current_step_number }}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50/50 py-8">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        <div class="flex items-center gap-2 text-sm text-gray-500 mb-6">
+            <a href="{% url 'organizations:my_organization' %}" class="hover:text-amber-dark flex items-center gap-1">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                </svg>
+                Dashboard
+            </a>
+        </div>
+
+        <div class="bg-white rounded-xl border border-gray-100 p-6 sm:p-8">
+            <h1 class="text-2xl font-bold text-navy mb-1">Post an Opportunity</h1>
+            <p class="text-gray-500 mb-6">Share opportunities with thousands of qualified candidates on behalf of {{ organization.name }}</p>
+
+            <!-- Progress indicator -->
+            <div class="flex items-center gap-2 mb-8">
+                {% for step_key, step_title in step_titles.items %}
+                {% with step_num=forloop.counter %}
+                <div class="flex-1 flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold shrink-0
+                        {% if step_num <= current_step_number %}bg-amber text-navy{% else %}bg-gray-100 text-gray-400{% endif %}">
+                        {{ step_num }}
+                    </div>
+                    {% if not forloop.last %}
+                    <div class="flex-1 h-0.5 {% if step_num < current_step_number %}bg-amber{% else %}bg-gray-200{% endif %}"></div>
+                    {% endif %}
+                </div>
+                {% endwith %}
+                {% endfor %}
+            </div>
+
+                <h3 class="font-semibold text-navy mb-4">{{ current_step_title }}</h3>
+
+            <form method="post" enctype="multipart/form-data" class="space-y-4">
+                {% csrf_token %}
+                {{ wizard.management_form }}
+
+                {% if wizard.form.forms %}
+                    {{ wizard.form.management_form }}
+                    {% for form in wizard.form.forms %}
+                        {{ form }}
+                    {% endfor %}
+                {% else %}
+                    {% for field in wizard.form %}
+                    <div>
+                        <label class="form-label">
+                            {{ field.label }}{% if field.field.required %} *{% endif %}
+                        </label>
+
+                        {% if field.name == "remote" %}
+                        <label class="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+                            {{ field }}
+                            Remote work available
+                        </label>
+                        {% else %}
+                            {{ field }}
+                        {% endif %}
+
+                        {% if field.help_text %}<p class="text-xs text-gray-400 mt-1">{{ field.help_text }}</p>{% endif %}
+                        {% for error in field.errors %}<p class="text-red-500 text-xs mt-1">{{ error }}</p>{% endfor %}
+                    </div>
+                    {% endfor %}
+                {% endif %}
+
+                {% if wizard.steps.prev %}
+                <div class="flex justify-between mt-8">
+                    <button type="submit" name="wizard_goto_step" value="{{ wizard.steps.prev }}" class="btn-outline">
+                        Previous
+                    </button>
+                    <button type="submit" class="btn-primary">
+                        {% if wizard.steps.current == wizard.steps.last %}Publish Opportunity{% else %}Next{% endif %}
+                    </button>
+                </div>
+                {% else %}
+                <div class="flex justify-end mt-8">
+                    <button type="submit" class="btn-primary">Next</button>
+                </div>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
