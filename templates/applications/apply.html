@@ -19,16 +19,21 @@
             <h1 class="text-2xl font-bold text-navy mb-1">Apply for this Opportunity</h1>
             <p class="text-gray-500 mb-6">{{ opportunity.title }} at {{ opportunity.organization.name|default:"Unknown Organization" }}</p>
 
-            <form method="post" enctype="multipart/form-data" class="space-y-5">
+        <form method="post" enctype="multipart/form-data" class="space-y-5" x-data="{ ...liveValidation(), coverLetter: '' }">
                 {% csrf_token %}
 
                 <div>
                     <label class="form-label">{{ form.cover_letter.label }}</label>
-                    {{ form.cover_letter }}
+                    <textarea name="cover_letter" rows="6" x-model="coverLetter"
+                            @blur="validateRequired('cover_letter', coverLetter)"
+                            class="form-input" :class="hasError('cover_letter') ? 'border-red-400' : ''"
+                            placeholder="Tell the employer why you're a great fit for this opportunity...">{{ form.cover_letter.value|default:"" }}</textarea>
+                    <p x-show="hasError('cover_letter')" x-cloak class="text-red-500 text-xs mt-1" x-text="errors.cover_letter"></p>
                     {% for error in form.cover_letter.errors %}
                         <p class="text-red-500 text-xs mt-1">{{ error }}</p>
                     {% endfor %}
                 </div>
+
 
                 <div>
                     <label class="form-label">{{ form.resume.label }}</label>

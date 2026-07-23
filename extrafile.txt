@@ -1,114 +1,25 @@
-from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from django.db import IntegrityError
-from django.shortcuts import render, redirect, get_object_or_404
-from django.views.decorators.http import require_POST
+Details Views from opportunity/view.py
+def detail_view(request, slug):
+    opportunity = get_object_or_404(
+        Opportunity.objects.select_related("organization", "category"), slug=slug
+    )
 
-from apps.opportunities.models import Opportunity
-from .forms import ApplicationForm
-from .models import Application
+    Opportunity.objects.filter(pk=opportunity.pk).update(views=opportunity.views + 1)
 
+    already_applied = False
+    if request.user.is_authenticated:
+        already_applied = Application.objects.filter(
+            opportunity=opportunity, user=request.user
+        ).exists()
 
-@login_required
-def apply_view(request, slug):
-    """
-    Handles the internal application form — used when the opportunity
-    has no external application_link.
-    """
-    opportunity = get_object_or_404(Opportunity, slug=slug, status="active")
+    related = Opportunity.objects.filter(
+        category=opportunity.category, status="active"
+    ).exclude(pk=opportunity.pk).select_related("organization", "category")[:3]
 
-    if opportunity.application_link:
-        # This opportunity should be applied to externally — redirect
-        # back to the detail page rather than showing a form that
-        # doesn't apply here.
-        messages.info(request, "This opportunity uses an external application process.")
-        return redirect("opportunities:detail", slug=opportunity.slug)
-
-    existing = Application.objects.filter(opportunity=opportunity, user=request.user).first()
-    if existing:
-        messages.info(request, "You've already applied to this opportunity.")
-        return redirect("opportunities:detail", slug=opportunity.slug)
-
-    if opportunity.is_expired:
-        messages.error(request, "This opportunity's application deadline has passed.")
-        return redirect("opportunities:detail", slug=opportunity.slug)
-
-    if request.method == "POST":
-        form = ApplicationForm(request.POST, request.FILES, user_resume=request.user.resume)
-        if form.is_valid():
-            application = form.save(commit=False)
-            application.opportunity = opportunity
-            application.user = request.user
-
-            # Reuse profile resume if no file was uploaded for this application
-            if not application.resume and request.user.resume:
-                application.resume = request.user.resume
-
-            try:
-                application.save()
-            except IntegrityError:
-                # Race condition guard: two simultaneous submits from the
-                # same user (e.g. double-click) — the UniqueConstraint
-                # from Phase 3 catches it at the DB level even if our
-                # earlier `existing` check was bypassed by a timing gap.
-                messages.info(request, "You've already applied to this opportunity.")
-                return redirect("opportunities:detail", slug=opportunity.slug)
-
-            _increment_application_count(opportunity)
-
-            messages.success(request, "Your application was submitted successfully!")
-            return redirect("applications:success", slug=opportunity.slug)
-    else:
-        form = ApplicationForm(user_resume=request.user.resume)
-
-    return render(request, "applications/apply.html", {
+    context = {
         "opportunity": opportunity,
-        "form": form,
-    })
-
-
-@login_required
-def success_view(request, slug):
-    opportunity = get_object_or_404(Opportunity, slug=slug)
-    return render(request, "applications/success.html", {"opportunity": opportunity})
-
-
-@login_required
-@require_POST
-def apply_external(request, slug):
-    """
-    Records a tracked application when the opportunity uses an
-    external application_link — the actual application happens on
-    the employer's site, but we still track intent-to-apply so it
-    shows up in the user's dashboard.
-    """
-    opportunity = get_object_or_404(Opportunity, slug=slug, status="active")
-
-    if not opportunity.application_link:
-        messages.error(request, "This opportunity doesn't have an external application link.")
-        return redirect("opportunities:detail", slug=opportunity.slug)
-
-    existing = Application.objects.filter(opportunity=opportunity, user=request.user).first()
-    if not existing:
-        try:
-            Application.objects.create(opportunity=opportunity, user=request.user)
-            _increment_application_count(opportunity)
-        except IntegrityError:
-            pass  # already applied — fine, just proceed to redirect
-
-    return redirect(opportunity.application_link)
-
-
-@login_required
-@require_POST
-def withdraw_view(request, application_id):
-    application = get_object_or_404(Application, id=application_id, user=request.user)
-    application.status = Application.Status.WITHDRAWN
-    application.save(update_fields=["status"])
-    messages.success(request, "Application withdrawn.")
-    return redirect(request.META.get("HTTP_REFERER", "dashboard:applications"))
-
-
-def _increment_application_count(opportunity):
-    opportunity.applications_count = opportunity.applications.count()
-    opportunity.save(update_fields=["applications_count"])
+        "already_applied": already_applied,
+        "related_opportunities": related,
+        "is_expired": opportunity.deadline < timezone.now().date(),
+    }
+    return render(request, "opportunities/detail.html", context)

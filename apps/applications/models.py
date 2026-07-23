@@ -23,7 +23,7 @@ class Application(models.Model):
     )
 
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.APPLIED)
-    cover_letter = models.TextField(blank=True)
+    cover_letter = models.TextField()
     resume = models.FileField(upload_to="application_resumes/", blank=True, null=True)
     portfolio_url = models.URLField(blank=True)
     answers = models.JSONField(blank=True, default=dict)

@@ -1,5 +1,7 @@
 from django import forms
 
+from apps.categories.models import Category
+
 from .models import Opportunity
 
 
@@ -13,8 +15,8 @@ class StepBasicInfoForm(forms.Form):
         max_length=500,
         widget=forms.TextInput(attrs={"class": INPUT_CLASS, "placeholder": "e.g., Senior Software Engineer"}),
     )
-    category = forms.ChoiceField(
-        choices=Opportunity.Category_.choices,
+    category = forms.ModelChoiceField(
+        queryset=Category.objects.all(),
         widget=forms.Select(attrs={"class": SELECT_CLASS}),
     )
     opportunity_type = forms.ChoiceField(

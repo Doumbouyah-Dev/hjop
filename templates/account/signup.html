@@ -48,7 +48,11 @@
 
     <div>
         <label class="block text-sm font-medium text-gray-700 mb-1.5">Password</label>
-        {{ form.password1 }}
+        <input type="password" name="password1" x-model="password1"
+               @input="validatePasswordMatch(password1, password2)"
+               class="w-full pl-3 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber focus:border-amber"
+               :class="hasError('password_match') ? 'border-red-400' : 'border-gray-300'"
+               placeholder="Minimum 8 characters">
         {% for error in form.password1.errors %}
             <p class="text-red-500 text-xs mt-1">{{ error }}</p>
         {% endfor %}
@@ -56,7 +60,12 @@
 
     <div>
         <label class="block text-sm font-medium text-gray-700 mb-1.5">Confirm Password</label>
-        {{ form.password2 }}
+        <input type="password" name="password2" x-model="password2"
+               @input="validatePasswordMatch(password1, password2)"
+               class="w-full pl-3 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber focus:border-amber"
+               :class="hasError('password_match') ? 'border-red-400' : 'border-gray-300'"
+               placeholder="Confirm your password">
+        <p x-show="hasError('password_match')" x-cloak class="text-red-500 text-xs mt-1" x-text="errors.password_match"></p>
         {% for error in form.password2.errors %}
             <p class="text-red-500 text-xs mt-1">{{ error }}</p>
         {% endfor %}

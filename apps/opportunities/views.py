@@ -6,6 +6,7 @@ from django.utils import timezone
 from apps.categories.models import Category
 from apps.applications.models import Application
 from .models import Opportunity
+from django.db.models import F
 
 
 SORT_OPTIONS = {
@@ -83,7 +84,9 @@ def detail_view(request, slug):
         Opportunity.objects.select_related("organization", "category"), slug=slug
     )
 
-    Opportunity.objects.filter(pk=opportunity.pk).update(views=opportunity.views + 1)
+
+    Opportunity.objects.filter(pk=opportunity.pk).update(views=F("views") + 1)
+    opportunity.refresh_from_db(fields=["views"])
 
     already_applied = False
     if request.user.is_authenticated:

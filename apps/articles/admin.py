@@ -21,7 +21,7 @@ class ArticleAdmin(admin.ModelAdmin):
 
     fieldsets = (
         (None, {"fields": ("title", "slug", "category", "cover_image")}),
-        ("Content", {"fields": ("excerpt", "content")}),
+        ("Content", {"fields": ("excerpt", "content"), "description": "Content supports Markdown formatting: **bold**, # Headers, - lists, [links](url)."}),
         ("Authorship", {"fields": ("author", "author_name")}),
         ("Publishing", {"fields": ("published", "featured", "published_at")}),
         ("Stats", {"fields": ("view_count",)}),

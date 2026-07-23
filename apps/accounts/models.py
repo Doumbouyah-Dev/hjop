@@ -3,6 +3,8 @@ from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.utils import timezone
 
+from config import settings
+
 
 class UserManager(BaseUserManager):
     """
@@ -114,3 +116,31 @@ class User(AbstractUser):
         ]
         filled = sum(1 for f in fields_to_check if f)
         return round((filled / len(fields_to_check)) * 100)
+
+class Notification(models.Model):
+    class NotificationType(models.TextChoices):
+        APPLICATION_UPDATE = "application_update", "Application Update"
+        OPPORTUNITY_MATCH = "opportunity_match", "New Opportunity Match"
+        DEADLINE_REMINDER = "deadline_reminder", "Deadline Reminder"
+        SYSTEM = "system", "System"
+        MESSAGE = "message", "Message"
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="notifications"
+    )
+    notification_type = models.CharField(max_length=30, choices=NotificationType.choices)
+    title = models.CharField(max_length=255)
+    message = models.TextField(blank=True)
+    link = models.CharField(max_length=500, blank=True)
+    read = models.BooleanField(default=False, db_index=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "notifications"
+        ordering = ["-created_at"]
+        indexes = [
+            models.Index(fields=["user", "read"]),
+        ]
+
+    def __str__(self):
+        return f"{self.get_notification_type_display()} → {self.user}"

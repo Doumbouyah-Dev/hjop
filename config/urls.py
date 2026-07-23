@@ -15,6 +15,8 @@ urlpatterns = [
     path("bookmarks/", include("apps.bookmarks.urls")),
     path("applications/", include("apps.applications.urls")),
     path("organizations/", include("apps.organizations.urls")),
+    path("accounts/", include("apps.accounts.urls")),
+    path("accounts/", include("allauth.urls")),
 ]
 
 if settings.DEBUG:

@@ -18,7 +18,7 @@ class Article(models.Model):
     author = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name="articles"
     )
-
+    author_name = models.CharField(max_length=150, blank=True, help_text="Alternative text if author has no user account")
     published = models.BooleanField(default=False)
     featured = models.BooleanField(default=False)
     view_count = models.PositiveIntegerField(default=0)

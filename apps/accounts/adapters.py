@@ -1,6 +1,8 @@
 from allauth.account.adapter import DefaultAccountAdapter
 from django.urls import reverse
 
+from apps.accounts.services import notify
+
 
 class CustomAccountAdapter(DefaultAccountAdapter):
     """
@@ -24,3 +26,18 @@ class CustomAccountAdapter(DefaultAccountAdapter):
         """
         user.email = user.email.lower().strip()
         return super().save_user(request, user, form, commit)
+
+        # ... existing methods ...
+
+    def save_user(self, request, user, form, commit=True):
+        user.email = user.email.lower().strip()
+        user = super().save_user(request, user, form, commit)
+        if commit:
+            notify(
+                user=user,
+                notification_type="system",
+                title="Welcome to HJ Opportunity Hub!",
+                message="Explore jobs, scholarships, and grants tailored for you. Complete your profile to get started.",
+                link="/dashboard/profile/",
+            )
+        return user

@@ -1,0 +1,38 @@
+<div class="absolute top-full mt-1 right-0 w-80 bg-white rounded-lg shadow-lg border border-gray-100 max-h-96 overflow-y-auto">
+    <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+        <span class="font-semibold text-navy text-sm">Notifications</span>
+        {% if unread_count %}
+        <button hx-post="{% url 'accounts:notifications_mark_all_read' %}"
+                hx-target="#notification-dropdown-content" hx-swap="innerHTML"
+                class="text-xs text-amber-dark hover:underline">
+            Mark all read
+        </button>
+        {% endif %}
+    </div>
+
+    <div id="notification-dropdown-content">
+        {% if notifications %}
+            {% for n in notifications %}
+            <form method="post" action="{% url 'accounts:notification_read' n.pk %}">
+                {% csrf_token %}
+                <button type="submit"
+                    class="w-full text-left px-4 py-3 border-b border-gray-50 hover:bg-gray-50 transition-colors flex gap-3
+                    {% if not n.read %}bg-amber/5{% endif %}">
+                    <span class="w-2 h-2 rounded-full shrink-0 mt-1.5 {% if not n.read %}bg-amber{% else %}bg-transparent{% endif %}"></span>
+                    <span class="min-w-0">
+                        <span class="block text-sm font-medium text-gray-900 truncate">{{ n.title }}</span>
+                        {% if n.message %}<span class="block text-xs text-gray-500 line-clamp-2">{{ n.message }}</span>{% endif %}
+                        <span class="block text-xs text-gray-400 mt-1">{{ n.created_at|timesince }} ago</span>
+                    </span>
+                </button>
+            </form>
+            {% endfor %}
+        {% else %}
+            <div class="px-4 py-8 text-center text-sm text-gray-400">No notifications yet.</div>
+        {% endif %}
+    </div>
+
+    <a href="{% url 'accounts:notifications' %}" class="block text-center py-3 text-sm text-amber-dark hover:underline border-t border-gray-100">
+        View all notifications
+    </a>
+</div>

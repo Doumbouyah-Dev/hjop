@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% load article_extras %}
+
+
+{% block title %}{{ article.title }} — HJ Opportunity Hub{% endblock %}
+{% block meta_description %}{{ article.excerpt|default:article.title }}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50/50">
+
+    <!-- Cover image banner -->
+    <div class="h-64 sm:h-80 bg-gradient-to-br from-navy to-[#1a3050] flex items-center justify-center overflow-hidden">
+        {% if article.cover_image %}
+            <img src="{{ article.cover_image.url }}" alt="" class="w-full h-full object-cover">
+        {% endif %}
+    </div>
+
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 -mt-16 relative">
+        <div class="bg-white rounded-xl border border-gray-100 p-6 sm:p-10">
+
+            <div class="flex items-center gap-2 text-sm text-gray-500 mb-4">
+                <a href="{% url 'articles:list' %}" class="hover:text-amber-dark flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                    </svg>
+                    Back to Blog
+                </a>
+            </div>
+
+            {% if article.category %}
+            <span class="badge bg-amber/10 text-amber-dark border-amber/20 mb-4">{{ article.category }}</span>
+            {% endif %}
+
+            <h1 class="text-2xl sm:text-3xl font-bold text-navy mb-4 leading-tight">{{ article.title }}</h1>
+
+            <div class="flex items-center gap-4 text-sm text-gray-500 mb-8 pb-8 border-b border-gray-100">
+                <span>By {{ article.author.get_full_name|default:article.author_name|default:"HJ Opportunity Hub" }}</span>
+                <span>·</span>
+                <span>{{ article.published_at|date:"F d, Y" }}</span>
+                <span>·</span>
+                <span>{{ article.view_count }} view{{ article.view_count|pluralize }}</span>
+            </div>
+
+            <!-- Article body -->
+            <div class="prose prose-neutral max-w-none text-gray-700 leading-relaxed whitespace-pre-line">
+                {{ article.content|render_markdown }}
+            </div>
+        </div>
+
+        <!-- Related articles -->
+        {% if related_articles %}
+        <div class="my-12">
+            <h2 class="text-xl font-bold text-navy mb-6">Related Articles</h2>
+            <div class="grid sm:grid-cols-3 gap-6">
+                {% for related in related_articles %}
+                    {% with article=related %}
+                        {% include "articles/partials/card.html" %}
+                    {% endwith %}
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

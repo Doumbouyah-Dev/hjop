@@ -57,3 +57,37 @@ class UserAdmin(BaseUserAdmin):
     @admin.display(description="Profile %")
     def profile_complete_percent(self, obj):
         return f"{obj.profile_complete_percent}%"
+    
+    
+from django.utils.html import format_html
+from .models import Notification
+
+
+@admin.register(Notification)
+class NotificationAdmin(admin.ModelAdmin):
+    list_display = ["user", "notification_type", "title", "read_badge", "created_at"]
+    list_filter = ["notification_type", "read"]
+    search_fields = ["user__email", "title", "message"]
+    autocomplete_fields = ["user"]
+    readonly_fields = ["created_at"]
+    actions = ["mark_read", "mark_unread"]
+
+    @admin.display(description="Status")
+    def read_badge(self, obj):
+        color = "#6b7280" if obj.read else "#2563eb"
+        label = "Read" if obj.read else "Unread"
+        return format_html(
+            '<span style="color:white;background:{};padding:2px 8px;'
+            'border-radius:9999px;font-size:11px;font-weight:600;">{}</span>',
+            color, label
+        )
+
+    @admin.action(description="Mark selected as read")
+    def mark_read(self, request, queryset):
+        updated = queryset.update(read=True)
+        self.message_user(request, f"{updated} notification(s) marked read.")
+
+    @admin.action(description="Mark selected as unread")
+    def mark_unread(self, request, queryset):
+        updated = queryset.update(read=False)
+        self.message_user(request, f"{updated} notification(s) marked unread.")

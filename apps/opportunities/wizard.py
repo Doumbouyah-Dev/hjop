@@ -4,6 +4,7 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from formtools.wizard.views import SessionWizardView
 
+
 from apps.organizations.models import Organization
 from .forms import StepBasicInfoForm, StepDetailsForm, StepApplicationInfoForm
 from .models import Opportunity
@@ -102,4 +103,4 @@ class PostOpportunityWizard(SessionWizardView):
         return redirect(reverse("opportunities:detail", kwargs={"slug": opportunity.slug}))
 
 
-post_opportunity_wizard = PostOpportunityWizard.as_view()
+post_opportunity_wizard = PostOpportunityWizard.as_view() 

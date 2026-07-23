@@ -53,43 +53,65 @@
                 </a>
 
                 {% if user.is_authenticated %}
-                <a href="{% url 'dashboard:saved' %}" class="relative p-2 rounded-lg text-gray-500 hover:text-navy hover:bg-gray-50 transition-colors">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
-                    </svg>
-                    {% if saved_count %}
-                    <span class="absolute -top-0.5 -right-0.5 w-4 h-4 bg-amber text-navy text-[10px] font-bold rounded-full flex items-center justify-center">
-                        {{ saved_count }}
-                    </span>
-                    {% endif %}
-                </a>
-
-                <div class="relative" x-data="{ open: false }" @click.outside="open = false">
-                    <button @click="open = !open" class="flex items-center gap-2 p-1.5 rounded-lg hover:bg-gray-50 transition-colors">
-                        <div class="w-8 h-8 rounded-full bg-navy flex items-center justify-center text-white text-sm font-medium overflow-hidden">
-                            {% if user.avatar %}
-                                <img src="{{ user.avatar.url }}" alt="" class="w-full h-full object-cover">
-                            {% else %}
-                                {{ user.email|first|upper }}
+                        <a href="{% url 'dashboard:saved' %}" class="relative p-2 rounded-lg text-gray-500 hover:text-navy hover:bg-gray-50 transition-colors">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
+                            </svg>
+                            {% if saved_count %}
+                            <span class="absolute -top-0.5 -right-0.5 w-4 h-4 bg-amber text-navy text-[10px] font-bold rounded-full flex items-center justify-center">
+                                {{ saved_count }}
+                            </span>
                             {% endif %}
+                        </a>
+
+                        <div class="relative" x-data="{ open: false }" @click.outside="open = false">
+                            <button @click="open = !open" class="flex items-center gap-2 p-1.5 rounded-lg hover:bg-gray-50 transition-colors">
+                                <div class="w-8 h-8 rounded-full bg-navy flex items-center justify-center text-white text-sm font-medium overflow-hidden">
+                                    {% if user.avatar %}
+                                        <img src="{{ user.avatar.url }}" alt="" class="w-full h-full object-cover">
+                                    {% else %}
+                                        {{ user.email|first|upper }}
+                                    {% endif %}
+                                </div>
+                            </button>
+                            <div x-show="open" x-cloak x-transition
+                                class="absolute top-full mt-1 right-0 w-56 bg-white rounded-lg shadow-lg border border-gray-100 py-1">
+                                <div class="px-3 py-2 border-b border-gray-100">
+                                    <p class="text-sm font-semibold text-gray-900 truncate">{{ user.get_full_name|default:user.email }}</p>
+                                    <p class="text-xs text-gray-500 truncate">{{ user.email }}</p>
+                                </div>
+                                <a href="{% url 'dashboard:home' %}" class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Dashboard</a>
+                                <a href="{% url 'dashboard:saved' %}" class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Saved Opportunities</a>
+                                <a href="{% url 'dashboard:profile' %}" class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Profile</a>
+                                {% if user.role == 'employer' %}
+                                <a href="{% url 'organizations:post_opportunity' %}" class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Post Opportunity</a>
+                                {% endif %}
+                                <div class="border-t border-gray-100 mt-1"></div>
+                                <a href="{% url 'account_logout' %}" class="flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-gray-50">Logout</a>
+                            </div>
                         </div>
-                    </button>
-                    <div x-show="open" x-cloak x-transition
-                         class="absolute top-full mt-1 right-0 w-56 bg-white rounded-lg shadow-lg border border-gray-100 py-1">
-                        <div class="px-3 py-2 border-b border-gray-100">
-                            <p class="text-sm font-semibold text-gray-900 truncate">{{ user.get_full_name|default:user.email }}</p>
-                            <p class="text-xs text-gray-500 truncate">{{ user.email }}</p>
-                        </div>
-                        <a href="{% url 'dashboard:home' %}" class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Dashboard</a>
-                        <a href="{% url 'dashboard:saved' %}" class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Saved Opportunities</a>
-                        <a href="{% url 'dashboard:profile' %}" class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Profile</a>
-                        {% if user.role == 'employer' %}
-                        <a href="{% url 'organizations:post_opportunity' %}" class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Post Opportunity</a>
-                        {% endif %}
-                        <div class="border-t border-gray-100 mt-1"></div>
-                        <a href="{% url 'account_logout' %}" class="flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-gray-50">Logout</a>
-                    </div>
-                </div>
+                    
+
+                        <!-- Notification Bell -->
+<div class="relative" x-data="{ open: false }" @click.outside="open = false">
+    <button @click="open = !open; if (open) htmx.trigger('#notif-dropdown-container', 'load')"
+            class="relative p-2 rounded-lg text-gray-500 hover:text-navy hover:bg-gray-50 transition-colors">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+        </svg>
+        <div hx-get="{% url 'accounts:notifications_badge' %}" hx-trigger="load, every 60s" hx-swap="innerHTML">
+        </div>
+    </button>
+    <div x-show="open" x-cloak x-transition id="notif-dropdown-container"
+         hx-get="{% url 'accounts:notifications_dropdown' %}" hx-trigger="load"
+         hx-swap="innerHTML">
+        <!-- Loading placeholder shown briefly before HTMX swaps in real content -->
+        <div class="absolute top-full mt-1 right-0 w-80 bg-white rounded-lg shadow-lg border border-gray-100 p-4 text-center text-sm text-gray-400">
+            Loading...
+        </div>
+    </div>
+</div>
+
                 {% else %}
                 <div class="hidden sm:flex items-center gap-2">
                     <a href="{% url 'account_login' %}" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-navy transition-colors">Sign In</a>
